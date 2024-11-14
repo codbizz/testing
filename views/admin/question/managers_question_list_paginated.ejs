@@ -1,0 +1,198 @@
+<%- include('./../header')-%>
+    <link href="/pagination/dist/pagination.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
+        td {
+            /* css-3 */
+            white-space: -o-pre-wrap;
+            word-wrap: break-word;
+            white-space: -moz-pre-wrap;
+        }
+
+        .list_of_question::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
+    </style>
+    <%- include('./../navbar',{user: user})-%>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Questions List</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item active">Questions List</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <%- include('./../alert') %>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <form class="d-flex justify-content-between align-items-center" action="" id="filterForm">
+                            <input class="form-control" type="text" name="question_text" placeholder="Question Text in English" value="<%= myvalue.question_text ?? "" %>" />
+                            <input class="form-control mx-2" type="number" name="limit" value="<%= myvalue.limit == null ? 10 : myvalue.limit=="" ? 10 : myvalue.limit %>" placeholder="Limit" />
+                            <div class="form-group mb-0 border rounded mr-2" style="padding: 6px 10px;">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" class="custom-control-input" id="customSwitch1" name="is_error" value="true" <%= myvalue.is_error ? 'checked' : '' %>>
+                                    <label class="custom-control-label" for="customSwitch1">Show&nbsp;Question&nbsp;With&nbsp;Errors</label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Search</button>
+                        </form>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button class="btn btn-primary" onclick="redirectToAddManagerQuestion()">Add</button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 mt-2">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Questions(<%= questionDetailsPaginated.totalDocs %>)</h3>
+                                    <div class="card-tools"></div>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body table-responsive p-0">
+                                    <table class="table table-head-fixed table-hover list_of_question" id="questionsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>No.</th>
+                                                <th>ID</th>
+                                                <th>Question&nbsp;in&nbsp;English</th>
+                                                <!-- <th>Question in Hindi</th> -->
+                                                <th>Correct&nbsp;Answer</th>
+                                                <th>Error&nbsp;In&nbsp;Question</th>
+                                                <th>Explanation</th>
+                                                <th></th>
+                                                <!-- <th>Subject</th> -->
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% var questionLists=questionDetailsPaginated.docs; for(var i=0; i<questionLists.length; i++){ %>
+                                                <tr>
+                                                    <td>
+                                                        <%= questionDetailsPaginated.pagingCounter + i %>
+                                                    </td>
+                                                    <td>
+                                                        <%= questionLists[i]._id %>
+                                                    </td>
+                                                    <td>
+                                                        <%= questionLists[i].text.EN.substring(0,50)+"..." %>
+                                                    </td>
+                                                    <td>
+                                                        <%= questionLists[i].correct_answer_id %>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge <%= questionLists[i].is_error ? 'bg-danger' : 'bg-success' %>" style="padding: 8px 10px;font-size: 16px;"><%= questionLists[i].is_error ? 'YES' : 'NO' %></span>
+                                                    </td>
+                                                    <td>
+                                                        <%= questionLists[i].explanation_in_english.substring(0,50)+"..." %>
+                                                    </td>
+                                                    <td>
+                                                        <a href="/admin/update-manager-question/<%= questionLists[i]._id %>">
+                                                            <button class="btn btn-block btn-primary btn-sm">Update</button>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            <% }%>
+
+                                            <% if(!questionDetailsPaginated.docs.length){ %>
+                                                <tr>
+                                                    <td colspan="6" align="center">NO DATA FOUND</td>
+                                                </tr>
+                                            <% } %>
+                                            
+                                            <!-- <% questionDetailsPaginated.docs %> -->
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <% if(questionDetailsPaginated.docs.length){ %>
+                                    <div class="card-footer clearfix">
+                                        <div id="pagination-demo1"></div>
+                                    </div>
+                                <% } %>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="modal fade" id="myModal" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Question Added</h4>
+
+                    </div>
+                    <div class="modal-body">
+                        <p>Question has been added to test series</p>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id="closeBtn">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="/pagination/dist/pagination.js"></script>
+        <script>
+            $(function () {
+                (function (name) {
+                    var container = $('#pagination-' + name);
+                    if (!container.length) return;
+                    var sources = function () {
+                        var result = [];
+                        for (var i = 0; i < <%= questionDetailsPaginated.totalDocs %>; i++) {
+                            result.push(i);
+                        }
+                        return result;
+                    }();
+
+                    var options = {
+                        dataSource: sources,
+                        pageSize: <%= questionDetailsPaginated.limit %>,
+                        pageNumber: <%= questionDetailsPaginated.page %>,
+                        prevText: 'Prev',
+                        nextText: 'Next',
+                        className: 'paginationjs-theme-blue paginationjs-big',
+                        callback: function (response, pagination) {
+                            // window.console && console.log(response, pagination);
+
+                            var dataHtml = '<ul>';
+                            $.each(response, function (index, item) {
+                                dataHtml += '<li>' + item + '</li>';
+                            });
+                            dataHtml += '</ul>';
+                            container.prev().html(dataHtml);
+                        }
+                    };
+                    $.pagination(container, options);
+
+                    container.pagination(options);
+
+                    container.addHook('afterPaging', function (page) {
+                        $(`<input type='hidden' value='${page}' />`).attr("name", "page").prependTo("#filterForm");
+                        $("#filterForm").submit();
+                    });
+                     
+                })('demo1');
+            });
+
+            function redirectToAddManagerQuestion() {
+                // Use window.location to navigate to the specified URL
+                window.location.href = '/admin/add-manager-question';
+            }
+        </script>
+        <%- include('./../footer')-%>

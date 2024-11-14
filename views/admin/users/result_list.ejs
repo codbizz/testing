@@ -1,0 +1,185 @@
+<%- include('./../header')-%>
+
+    <%- include('./../navbar',{user: user})-%>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Result List</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+                                <li class="breadcrumb-item active">Result List</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div><!-- /.container-fluid -->
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+
+                <%- include('./../alert') %>
+                    <div>
+                        <form action="" id="filterForm">
+
+
+
+                            <input type="text" name="user_id" placeholder="User id"
+                                value="<%= myvalue.user_id ?? "" %>">
+
+                            <input type="text" name="test_id" placeholder="Test ID"
+                                value="<%= myvalue.test_id ?? "" %>">
+
+
+
+
+                            <button type="submit">Search</button>
+                        </form>
+                    </div>
+
+                    <div class="row">
+                        <div class="">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Results (<%= resultDetailsPaginated.totalDocs %>)
+                                    </h3>
+
+                                    <div class="card-tools">
+
+                                    </div>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body table-responsive p-0">
+                                    <table class="table talble-hover text-nowrap">
+                                        <thead>
+                                            <tr>
+                                                <th>No.</th>
+                                                <th>Result Id</th>
+                                                <th>Test Name</th>
+                                                <th>Student Name</th>
+                                                <th>Marks</th>
+                                                <th>Date/Time</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% var resultList=resultDetailsPaginated.docs; for(var
+                                                i=0;i<resultList.length;i++){ %>
+                                                <tr>
+                                                    <td>
+                                                        <%= resultDetailsPaginated.pagingCounter + i %>
+                                                    </td>
+                                                    <td>
+                                                        <%= resultList[i]._id %>
+                                                    </td>
+
+                                                    <td>
+                                                        <a
+                                                            href="/admin/test-series-detail/<%= resultList[i].test_id._id %>">
+                                                            <%= resultList[i].test_id.title.EN %>
+                                                        </a>
+                                                    </td>
+
+                                                    <td>
+                                                        <a href="">
+                                                            <%= resultList[i].user_id.name %>
+                                                    </td>
+                                                    <td>
+                                                        <%= resultList[i].marks_obtained %>/<%=
+                                                                resultList[i].total_marks %>
+                                                    </td>
+
+                                                    <td>
+                                                        <%= resultList[i].createdAt.toString() %>
+                                                    </td>
+
+
+
+
+
+
+
+
+
+
+
+                                                    <% }%>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="card-footer clearfix">
+                                    <ul class="pagination pagination-sm m-0 float-left">
+                                        <% if(resultDetailsPaginated.hasPrevPage) {%>
+                                            <li class="page-item"><a class="page-link" onclick="prevPage()"
+                                                    href="#">Prev</a></li>
+                                            <%} %>
+                                                <li class="page-item"><a class="page-link" href="#">
+                                                        <%= resultDetailsPaginated.page %>
+                                                    </a></li>
+                                                <% if(resultDetailsPaginated.hasNextPage) {%>
+                                                    <li class="page-item"><a class="page-link" onclick="nextPage()"
+                                                            href="#">Next</a></li>
+                                                    <%} %>
+                                    </ul>
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+
+
+                            <!-- /.card -->
+                        </div>
+
+                    </div>
+
+
+
+
+
+            </section>
+        </div>
+
+
+        <div class="modal fade" id="myModal" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Question Added</h4>
+
+                    </div>
+                    <div class="modal-body">
+                        <p>Question has been added to test series</p>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id="closeBtn">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <script>
+            function nextPage() {
+                $("<input type='hidden' value='<%= resultDetailsPaginated.nextPage %>' />")
+                    .attr("name", "page")
+                    .prependTo("#filterForm");
+                $("#filterForm").submit();
+            }
+
+            function prevPage() {
+                $("<input type='hidden' value='<%= resultDetailsPaginated.prevPage %>' />")
+                    .attr("name", "page")
+                    .prependTo("#filterForm");
+                $("#filterForm").submit();
+            }
+
+            function openInRazorPay(emailId) {
+                window.open(`https://dashboard.razorpay.com/app/payments?count=25&email=${btoa(emailId)}`);
+            }
+        </script>
+        <%- include('./../footer')-%>

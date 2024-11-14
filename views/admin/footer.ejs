@@ -1,0 +1,14 @@
+<footer class="main-footer">
+    <strong id="current_next_year">Copyright © </strong>
+</footer>
+<script>
+    $(document).ready(function() {
+        var currentYear = new Date().getFullYear();
+        var nextYear = currentYear + 1;
+        $('#current_next_year').append(currentYear + '-' + nextYear);
+    });
+</script>
+</div>
+</body>
+
+</html>

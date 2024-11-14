@@ -1,0 +1,221 @@
+<%- include('./../header')-%>
+    <style>
+        td {
+
+            /* css-3 */
+            white-space: -o-pre-wrap;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            white-space: -moz-pre-wrap;
+            white-space: -pre-wrap;
+
+        }
+    </style>
+    <%- include('./../navbar',{user: user})-%>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Transaction List</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+                                <li class="breadcrumb-item active">Transaction List</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div><!-- /.container-fluid -->
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+
+                <%- include('./../alert') %>
+                    <div>
+                        <form action="" id="filterForm">
+                            <select name="status" id="">
+                                <option value="">All</option>
+                                <% ["paid","created","attempted","expired"].forEach(p=> { %>
+                                    <option value="<%= p %>" <%=myvalue.status==p ? "selected" : "" %>>
+                                        <%= p %>
+                                    </option>
+                                    <% }) %>
+
+                            </select>
+
+
+                            <input type="text" name="order_id" placeholder="Order ID"
+                                value="<%= myvalue.order_id ?? "" %>">
+
+                            <input type="text" name="user_email" placeholder="User Email"
+                                value="<%= myvalue.user_email ?? "" %>">
+
+                            <input type="text" name="set_id" placeholder="Set Id" value="<%= myvalue.set_id ?? "" %>">
+
+
+                            <button type="submit">Search</button>
+                        </form>
+                    </div>
+
+                    <div class="row">
+                        <div class="">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Transactions (<%= transactionDetailsPaginated.totalDocs %>)
+                                    </h3>
+
+                                    <div class="card-tools">
+
+                                    </div>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body table-responsive p-0">
+                                    <table class="table talble-hover text-nowrap">
+                                        <thead>
+                                            <tr>
+                                                <th>No.</th>
+                                                <th>Recipt Id</th>
+                                                <th>Order ID</th>
+                                                <th>Amount</th>
+                                                <th>Status</th>
+                                                <th>User Email</th>
+                                                <th>Expiry</th>
+                                                <th>Created</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% var transactionList=transactionDetailsPaginated.docs; for(var
+                                                i=0;i<transactionList.length;i++){ %>
+                                                <tr class="<%- transactionList[i].status=='paid' ? " bg-success" :
+                                                    transactionList[i].status=='expired' ? "bg-danger" : "" %>">
+                                                    <td>
+                                                        <%= transactionDetailsPaginated.pagingCounter + i %>
+                                                    </td>
+                                                    <td>
+                                                        <%= transactionList[i]._id %>
+                                                    </td>
+                                                    <td>
+                                                        <%= transactionList[i].order_id %>
+                                                    </td>
+                                                    <td>
+                                                        <%= transactionList[i].amount/100 %>
+                                                    </td>
+
+                                                    <td>
+                                                        <%= transactionList[i].status %>
+                                                    </td>
+
+                                                    <td>
+                                                        <%= transactionList[i].user_email ?? "N/A" %>
+                                                    </td>
+
+                                                    <td>
+                                                        <%= new Date(transactionList[i].purchase_expire)%>
+                                                    </td>
+                                                    <td>
+                                                        <%= transactionList[i].createdAt %>
+                                                    </td>
+                                                    <td>
+                                                        <%= transactionList[i].set_id ?
+                                                            transactionList[i].set_id.title.EN : "Set Deleted" %>
+                                                    </td>
+
+
+
+
+                                                    <td>
+
+                                                        <form action="/admin/refresh-transaction" method="post">
+                                                            <input type="hidden" name="transaction_id"
+                                                                value="<%= transactionList[i]._id %>">
+                                                            <button type="submit"
+                                                                class="btn btn-block btn-primary">Refresh</button>
+                                                        </form>
+                                                    </td>
+                                                    <td>
+                                                        <a href="https://dashboard.razorpay.com/app/orders?id=<%= transactionList[i].order_id %>"
+                                                            target="_blank">
+                                                            <button class="btn btn-block btn-primary">View on
+                                                                Razorpay</button></a>
+                                                    </td>
+
+
+
+
+
+
+                                                    <% }%>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="card-footer clearfix">
+                                    <ul class="pagination pagination-sm m-0 float-left">
+                                        <% if(transactionDetailsPaginated.hasPrevPage) {%>
+                                            <li class="page-item"><a class="page-link" onclick="prevPage()"
+                                                    href="#">Prev</a></li>
+                                            <%} %>
+                                                <li class="page-item"><a class="page-link" href="#">
+                                                        <%= transactionDetailsPaginated.page %>
+                                                    </a></li>
+                                                <% if(transactionDetailsPaginated.hasNextPage) {%>
+                                                    <li class="page-item"><a class="page-link" onclick="nextPage()"
+                                                            href="#">Next</a></li>
+                                                    <%} %>
+                                    </ul>
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+
+
+                            <!-- /.card -->
+                        </div>
+
+                    </div>
+
+
+
+
+
+            </section>
+        </div>
+
+
+        <div class="modal fade" id="myModal" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Question Added</h4>
+
+                    </div>
+                    <div class="modal-body">
+                        <p>Question has been added to test series</p>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id="closeBtn">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <script>
+            function nextPage() {
+                $("<input type='hidden' value='<%= transactionDetailsPaginated.nextPage %>' />")
+                    .attr("name", "page")
+                    .prependTo("#filterForm");
+                $("#filterForm").submit();
+            }
+
+            function prevPage() {
+                $("<input type='hidden' value='<%= transactionDetailsPaginated.prevPage %>' />")
+                    .attr("name", "page")
+                    .prependTo("#filterForm");
+                $("#filterForm").submit();
+            }
+        </script>
+        <%- include('./../footer')-%>

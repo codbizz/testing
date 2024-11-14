@@ -1,0 +1,240 @@
+<%- include('./../header')-%>
+    <style>
+        td {
+
+            /* css-3 */
+            white-space: -o-pre-wrap;
+            word-wrap: break-word;
+
+            white-space: -moz-pre-wrap;
+
+
+        }
+    </style>
+    <%- include('./../navbar',{user: user})-%>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Image List</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item active">Image List</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <button style="position: relative; left: 95%;" class="btn btn-primary" onclick="redirectToAddManagerQuestion()">Add</button>
+                </div><!-- /.container-fluid -->
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+
+                <%- include('./../alert') %>
+                    <div>
+                        <form action="" id="filterForm">
+                         
+
+
+                            <input type="text" name="question_text" placeholder="Image Title"
+                                value="<%= myvalue.question_text ?? "" %>">
+
+                            <input type="number" name="limit" value="<%= myvalue.limit == null ? 10 :
+                                myvalue.limit=="" ? 10 : myvalue.limit %>" placeholder="Limit">
+                            <button type="submit">Search</button>
+                        </form>
+                    </div>
+
+                    <div class="row">
+                        <div class="">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">images(<%= questionDetailsPaginated.totalDocs %>)</h3>
+
+                                    <div class="card-tools">
+
+                                    </div>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body table-responsive p-0" style="max-height: 502px;;overflow-y: scroll">
+                                    <table class="table talble-hover text-nowrap">
+                                        <thead>
+                                            <tr>
+                                                <th>No.</th>
+                                                <th>ID</th>
+                                                <!-- <th>Question in Hindi</th> -->
+
+                                                <th>Image Title</th>
+                                                <th>Image</th>
+                                                <th colspan="2" style="text-align: center;">Action</th>
+
+                                                <!-- <th>Subject</th> -->
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% var questionLists=questionDetailsPaginated.docs; for(var
+                                                i=0;i<questionLists.length;i++){ %>
+                                                <tr>
+                                                    <td>
+                                                        <%= questionDetailsPaginated.pagingCounter + i %>
+                                                    </td>
+                                                    <td>
+                                                        <%= questionLists[i]._id %>
+                                                    </td>
+                                                    <td>
+                                                        <%= questionLists[i].title %>
+                                                    </td>
+                                                    <td>
+                                                       
+                                                        <img src="<%=questionLists[i].filename%>" alt="Image" style="width: 44px;height: 47px; max-width: 45px;  min-width: 47px;">
+                                                    </td>
+                                                    <!-- <td>
+                                                      
+
+                                                    </td> -->
+                                                   
+                                                     <!-- <td>
+                                                        <a href="/admin/update-manager-question/<%= questionLists[i]._id %>">
+                                                            <button class="btn btn-block btn-primary">Update</button>
+                                                    </td> -->
+                                                     <td>
+                                                        <!-- <a href="/admin/update-manager-question/<%= questionLists[i]._id %>">
+                                                            <button class="btn btn-block btn-primary">Delete</button> -->
+                                                            <button type="button" onclick="getImgId('<%= questionLists[i]._id %>','<%= questionLists[i].title %>')" class="btn btn-default" data-toggle="modal" data-target="#modal-lg">
+                                                                Delete
+                                                              </button>
+                                                    </td>
+
+
+
+
+
+
+                                                    <% }%>
+                                                    <% if(!questionDetailsPaginated.docs.length){ %>
+                                                        <td colspan="5" align="center">
+                                                               NO DATA FOUND
+                                                           </td>
+                                                       
+                                                       <% } %>
+                                        </tbody>
+                                    </table>
+                                    <!-- <a href="/admin/upload-option-img">
+                                        <button class="btn btn-block btn-primary">Add</button> -->
+                                </div>
+
+                                <div class="card-footer clearfix">
+                                    <ul class="pagination pagination-sm m-0 float-left">
+                                        <% if(questionDetailsPaginated.hasPrevPage) {%>
+                                            <li class="page-item"><a class="page-link" onclick="prevPage()"
+                                                    href="#">Prev</a></li>
+                                            <%} %>
+                                                <li class="page-item"><a class="page-link" href="#">
+                                                        <%= questionDetailsPaginated.page %>
+                                                    </a></li>
+                                                <% if(questionDetailsPaginated.hasNextPage) {%>
+                                                    <li class="page-item"><a class="page-link" onclick="nextPage()"
+                                                            href="#">Next</a></li>
+                                                    <%} %>
+                                    </ul>
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+
+
+                            <!-- /.card -->
+                        </div>
+
+                    </div>
+
+
+
+
+
+            </section>
+        </div>
+
+
+        <div class="modal fade" id="myModal" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Question Added</h4>
+
+                    </div>
+                    <div class="modal-body">
+                        <p>Question has been added to test series</p>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id="closeBtn">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Model start  -->
+        <div class="modal fade" id="modal-lg">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title">Delete img</h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                <span>Image Title :</span> <span id="imgTitle"></span>
+                </div>
+                <div class="modal-footer justify-content-between">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary" onclick="navigateToUrl()">Delete</button>
+                </div>
+              </div>
+              <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+          </div>
+        <!-- Model end  -->
+
+
+        <script>
+            let selectedid 
+            let selectedimgtitle 
+            function nextPage() {
+                $("<input type='hidden' value='<%= questionDetailsPaginated.nextPage %>' />")
+                    .attr("name", "page")
+                    .prependTo("#filterForm");
+                $("#filterForm").submit();
+            }
+
+            function prevPage() {
+                $("<input type='hidden' value='<%= questionDetailsPaginated.prevPage %>' />")
+                    .attr("name", "page")
+                    .prependTo("#filterForm");
+                $("#filterForm").submit();
+            }
+            function getImgId(id,title) {
+                selectedid = id;
+                selectedimgtitle = title;
+               let imgTitle = document.getElementById("imgTitle");
+               if(imgTitle)
+               {
+                imgTitle.innerText=selectedimgtitle;
+               }
+            }
+            function navigateToUrl() {
+                if(selectedid)
+                {
+                   var url = "/admin/delete-uploaded-option-img/" + selectedid;
+                   window.location.href = url;
+               }
+            }
+            function redirectToAddManagerQuestion() {
+                // Use window.location to navigate to the specified URL
+                window.location.href = '/admin/upload-option-img';
+            }
+        </script>
+        <%- include('./../footer')-%>

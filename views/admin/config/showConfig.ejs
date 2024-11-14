@@ -1,0 +1,118 @@
+<%- include('./../header')-%>
+    <%- include('./../navbar',{user: user})-%>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Settings</h1>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <section class="content">
+                <%- include('./../alert') %>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <div class=" row">
+
+                                        </div>
+                                    </div>
+
+
+                                    <% if(configList && configList.length ) { %>
+                                        <div class="card-body">
+                                            <table id="example2" class="table table-bordered table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>S no.</th>
+                                                        <th>Name</th>
+                                                        <th>Value</th>
+                                                        <th>Options</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <% configList.forEach((setting,index)=>{ %>
+                                                        <tr>
+                                                            <td>
+                                                                <%=index + 1%>
+                                                            </td>
+                                                            <td>
+                                                                <%= setting.key.toUpperCase().split('_').join(' ') %>
+                                                            </td>
+                                                            <td>
+                                                                <%=setting.value %>
+                                                            </td>
+                                                            <td>
+                                                                <button class="btn btn-sm btn-outline-info"
+                                                                    data-toggle="modal"
+                                                                    data-target="#exampleModalCenter2<%= index+1 %>">
+                                                                    Edit 
+                                                                </button>
+                                                            </td>
+
+                                                        </tr>
+                                                        <div class="modal fade" id="exampleModalCenter2<%= index+1 %>"
+                                                            tabindex="-1" role="dialog"
+                                                            aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="exampleModalLongTitle">
+                                                                            Edit Setting
+                                                                        </h5>
+                                                                        <button type="button" class="close" data-dismiss="modal"
+                                                                            aria-label="Close">
+                                                                            <span aria-hidden="true">&times;</span>
+                                                                        </button>
+                                                                    </div>
+                                                                    <form action="/admin/config/update" method="post">
+                                                                        <div class="modal-body">
+                                                                            <div class="col-lg-12">
+                                                                                <label for=""><%=setting.key.toUpperCase().split('_').join(' ')%></label>
+                                                                                <div class="input-group">
+                                                                                    <input type="text"
+                                                                                        class="form-control form-control-lg"
+                                                                                        name="value"
+                                                                                        required
+                                                                                        style="font-size: 17px; color: grey;"
+                                                                                        value="<%=setting.value %>">
+                                                                                </div>
+                                                                            </div>
+                                                                        <input type="text" class="form-control form-control-lg" name="key" hidden  style="font-size: 17px; color: grey;" value="<%=setting.key%>" placeholder="Enter Start Date">
+                                                                        
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button"
+                                                                                class="btn btn-outline-secondary"
+                                                                                data-dismiss="modal">Close</button>
+                    
+                                                                            <button class="btn  btn-outline-success"
+                                                                                type="submit">Submit</button>
+                                                                        </div>
+                    
+                                                                    </form>
+                                                                </div>
+                    
+                                                            </div>
+                                                        </div>
+                                                    <%})%>
+                                                </tbody>
+
+                                            </table>
+
+                                        </div>
+                                    <% } %>
+
+                                        <!-- here paginantion -->
+                                    
+                        </div>
+                    </div>
+                    </div>
+            </section>
+        </div>

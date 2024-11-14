@@ -1,0 +1,202 @@
+<%- include('./../header') -%>
+
+    <%- include('./../navbar', { user: user }) -%>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Add Questions to <%= testDetail.title.EN %>
+                            </h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+                                <li class="breadcrumb-item active">Add Question To test series</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div><!-- /.container-fluid -->
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+
+                <%- include('./../alert') %>
+                    <div>
+                        <form action="" id="filterForm">
+                            <select name="subject_id" id="">
+                                <option value="">All Subjects</option>
+                                <% Object.keys(subjectStrings).forEach(key=> { %>
+                                    <option value="<%= key %>" <%=myvalue.subject_id==key ? "selected" : "" %>>
+                                        <%= subjectStrings[key] %>
+                                    </option>
+                                    <% }) %>
+
+                            </select>
+
+
+                            <input type="text" name="question_text" placeholder="Question Text in English"
+                                value="<%= myvalue.question_text ?? "" %>">
+
+                            <input type="number" name="limit" value="<%= myvalue.limit == null ? 10 :
+                                myvalue.limit=="" ? 10 : myvalue.limit %>" placeholder="Limit">
+                            <button type="submit">Search</button>
+                        </form>
+                    </div>
+
+                    <div class="row">
+                        <div class="">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Questions(<%= questionDetailsPaginated.totalDocs %>)</h3>
+
+                                    <div class="card-tools">
+
+                                    </div>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body table-responsive p-0">
+                                    <table class="table talble-hover text-nowrap">
+                                        <thead>
+                                            <tr>
+                                                <th>No.</th>
+                                                <th>ID</th>
+                                                <th>Question/Options in English</th>
+                                                <th>Question/Options in Hindi</th>
+
+                                                <th>Correct Answers</th>
+                                                <th>Explanation</th>
+
+                                                <th>Subject</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% var questionLists=questionDetailsPaginated.docs; for(var
+                                                i=0;i<questionLists.length;i++){ %>
+                                                <tr>
+                                                    <td>
+                                                        <%= questionDetailsPaginated.pagingCounter + i %>
+                                                    </td>
+                                                    <td>
+                                                        <%= questionLists[i]._id %>
+                                                    </td>
+                                                    <td>
+                                                        <%= questionLists[i].text.EN.substring(0,50)+"..." %><br>
+
+                                                    </td>
+                                                    <td>
+                                                        <%= questionLists[i].text.HI.substring(0,50)+"..." %><br>
+
+                                                    </td>
+
+
+
+
+                                                    <td>
+                                                        <%= questionLists[i].correct_answer_id %>
+                                                    </td>
+                                                    <td>
+                                                        <%= questionLists[i].explanation_in_english.substring(0,50)+"..."
+                                                            %><br>
+                                                            <%= questionLists[i].explanation_in_hindi.substring(0,50)+"..."
+                                                                %>
+                                                    </td>
+
+
+                                                    <td>
+                                                        <%= subjectStrings[questionLists[i].subject_id] %>
+                                                    </td>
+
+
+                                                    <td>
+                                                        <form action="/admin/add-existing-question" method="post">
+                                                            <input type="hidden" name="test_id"
+                                                                value="<%= testDetail._id %>">
+                                                            <input type="hidden" name="question_id"
+                                                                value="<%= questionLists[i]._id %>">
+
+                                                            <button type="submit" class="btn btn-block btn-primary">ADD
+                                                                To Test</button>
+                                                        </form>
+
+                                                    </td>
+
+
+
+
+
+
+                                                    <% }%>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="card-footer clearfix">
+                                    <ul class="pagination pagination-sm m-0 float-left">
+                                        <% if(questionDetailsPaginated.hasPrevPage) {%>
+                                            <li class="page-item"><a class="page-link" onclick="prevPage()"
+                                                    href="#">Prev</a></li>
+                                            <%} %>
+                                                <li class="page-item"><a class="page-link" href="#">
+                                                        <%= questionDetailsPaginated.page %>
+                                                    </a></li>
+                                                <% if(questionDetailsPaginated.hasNextPage) {%>
+                                                    <li class="page-item"><a class="page-link" onclick="nextPage()"
+                                                            href="#">Next</a></li>
+                                                    <%} %>
+                                    </ul>
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+
+
+                            <!-- /.card -->
+                        </div>
+
+                    </div>
+
+
+
+
+
+            </section>
+        </div>
+
+
+        <div class="modal fade" id="myModal" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Question Added</h4>
+
+                    </div>
+                    <div class="modal-body">
+                        <p>Question has been added to test series</p>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id="closeBtn">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <script>
+            function nextPage() {
+                $("<input type='hidden' value='<%= questionDetailsPaginated.nextPage %>' />")
+                    .attr("name", "page")
+                    .prependTo("#filterForm");
+                $("#filterForm").submit();
+            }
+
+            function prevPage() {
+                $("<input type='hidden' value='<%= questionDetailsPaginated.prevPage %>' />")
+                    .attr("name", "page")
+                    .prependTo("#filterForm");
+                $("#filterForm").submit();
+            }
+        </script>
+        <% - include('./../footer') -%>

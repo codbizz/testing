@@ -1,0 +1,189 @@
+<% %>
+    <form method="post" action="create-set" id="setForm">
+        <div class="card-body">
+            <div class="form-group">
+                <label for="title_english">Set Title in English</label>
+                <input required type="text" name="title_english" class="form-control"
+                    placeholder="Enter Title in English">
+            </div>
+            <div class="form-group">
+                <label for="title_hindi">Set Title in Hindi</label>
+                <input required type="text" name="title_hindi" class="form-control" placeholder="Enter Title in Hindi">
+            </div>
+
+
+
+
+            <div class="form-group">
+                <label for="description_english">Set Description in English</label>
+                <input required type="text" name="description_english" class="form-control"
+                    placeholder="Enter Description in English">
+            </div>
+            <div class="form-group">
+                <label for="description_hindi">Set Description in hindi</label>
+                <input required type="text" name="description_hindi" class="form-control"
+                    placeholder="Enter Description in hindi">
+            </div>
+
+            <div class="row">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="is_paid" id="flexRadioDefault1" value="false"
+                        checked>
+                    <label class="form-check-label" for="flexRadioDefault1" style="margin-right: 50px;">
+                        Free
+                    </label>
+                </div>
+                <br>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="is_paid" id="flexRadioDefault2" value="true">
+                    <label class="form-check-label" for="flexRadioDefault2">
+                        Paid
+                    </label>
+                </div>
+            </div>
+            <div id="paidHolder" style="display:none">
+                <div class="form-group">
+                    <label for="description_hindi">Amount</label>
+                    <input type="number" name="amount" class="form-control" placeholder="Enter Amount">
+                </div>
+
+
+                <div class="form-group">
+                    <label for="description_hindi">Days To Expire</label>
+                    <input type="number" name="days_to_expire" class="form-control" placeholder="Days to expire">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Type</label>
+                <select id="typeSelect" name="type" class="form-control">
+                    <option value="MOCK">MOCK</option>
+                    <option value="SUBJECT">SUBJECT</option>
+                </select>
+            </div>
+
+
+
+            <% if(locals.subjectList!=null && locals.subjectList.length>0){ %>
+                <div class="form-group" id="subjectSelect" style="display: none;">
+                    <label>Subject</label>
+                    <select id="subjectIdSelect" name="subject_id" class="form-control">
+                        <% subjectList.forEach(element=> {
+                            %>
+                            <option value="<%- element._id %>"><%- element.name %></option>
+                            <% }); %>
+                    </select>
+                </div>
+                <% } %>
+
+
+
+
+
+        </div>
+
+        <div class="card-footer">
+            <button type="submit" id="submitBtn" class="btn btn-primary">Create Set</button>
+        </div>
+    </form>
+
+
+    <div id="errorContainer" class="alert alert-danger alert-dismissible" style="display: none;"></div>
+
+    <div class="modal fade" id="myModal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Set Created</h4>
+
+                </div>
+                <div class="modal-body">
+                    <p>Set has been created. This is the ID of the set:</p>
+                    <p id="setId"></p>
+                    <p>Please Copy this ID,and use it in your Test Series Excel File</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"
+                        onclick="window.location.href = '/admin/set-lists';">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('#typeSelect').change(function () {
+            var selectedValue = $(this).val();
+            var additionalInput = $('#subjectSelect');
+
+            if (selectedValue === "MOCK") {
+                additionalInput.hide();
+            } else {
+                additionalInput.show();
+            }
+        });
+
+
+        $('input[type=radio][name=is_paid]').change(function () {
+            if (this.value == "true") {
+                $("#paidHolder").show()
+            } else {
+                $("#paidHolder").hide()
+            }
+        });
+
+        $('input[type=radio][name=is_paid]').change(function () {
+            if (this.value == "true") {
+                $("#paidHolder").show()
+            } else {
+                $("#paidHolder").hide()
+            }
+        });
+
+
+
+        $('#setForm').submit(function (event) {
+            $(this).find(':input').filter(function () {
+                return !this.value;
+            }).attr('disabled', true);
+            // return true;
+            event.preventDefault();
+
+            var form = $(this);
+            var url = form.attr('action');
+            var method = form.attr('method');
+            var data = form.serialize();
+            console.log(data);
+            // disable submit button and show loading spinner
+            form.find('#submitBtn').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Loading...');
+            var errorContainer = $('#errorContainer');
+            errorContainer.hide().empty();
+            $(this).find(':input').attr('disabled', false);
+            $.ajax({
+                url: url,
+                type: method,
+                data: data,
+                success: function (response) {
+                    console.log(response);
+                    $('#myModal').modal('show');
+
+                    // Set the ID of the set in the dialog
+                    $('#setId').text(response.data._id);
+                    //  window.location.replace(`set-detail/${response.data._id}`);
+                    form.find('#submitBtn').prop('disabled', false).html('Submit');
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    // handle error response here
+                    errorContainer.html(jqXHR.responseJSON.data).show();
+                    console.log(jqXHR.responseJSON.data);
+                    form.find('#submitBtn').prop('disabled', false).html('Submit');
+
+                }
+            });
+        });
+
+
+
+
+
+
+    </script>

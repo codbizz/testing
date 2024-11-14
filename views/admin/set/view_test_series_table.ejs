@@ -1,0 +1,141 @@
+<% if(locals.testLists!=null && locals.testLists.length>0 ) {%>
+
+
+    <div id="errorContainer" class="alert alert-danger alert-dismissible" style="display: none;"></div>
+
+
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Sets</h3>
+
+                    <div class="card-tools">
+
+                    </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body table-responsive p-0">
+                    <table class="table table-hover text-nowrap">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title English</th>
+
+                                <th>Number Of Questions</th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <%for(var i=0;i<testLists.length;i++){ %>
+                                <tr>
+                                    <td>
+                                        <%= testLists[i]._id %>
+                                    </td>
+                                    <td>
+                                        <%= testLists[i].title.EN %>
+                                    </td>
+
+                                    <td>
+                                        <%= testLists[i].question_count %>
+                                    </td>
+                                    <td>
+                                        <a href="/admin/test-series-detail/<%= testLists[i]._id %>"> <button
+                                                class="btn btn-block btn-primary">Details</button>
+                                    </td>
+                                    <td>
+                                        <a href="/admin/update-test/<%= testLists[i]._id %>"> <button
+                                                class="btn btn-block btn-primary">Update</button>
+                                    </td>
+
+                                    <td>
+                                        <a onclick="showWarning('<%- testLists[i]._id %>')"> <button
+                                                class="btn btn-block btn-danger">Delete</button>
+                                    </td>
+
+
+
+
+                                    <% }%>
+
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.card-body -->
+            </div>
+
+
+            <!-- /.card -->
+        </div>
+    </div>
+
+
+
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Set Created</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p id="dMsg"></p>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"
+                        onclick="window.location.href = '/admin/set-lists';">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="deleteWarning" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title ">Warning - Deleting The Set</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p class="alert-danger">
+
+                        All Questions of the test series will be Deleted
+                    </p>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" id="deleteSetBtn">Delete</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+    <script>
+        function showWarning(testID) {
+            $("#deleteSetBtn").attr('onclick', `deleteTest('${testID}')`);
+            $("#deleteWarning").modal('show');
+        }
+
+        function deleteTest(testID) {
+            $('<form>', {
+                "id": "deleteSetForm",
+                "html": '<input type="hidden"  name="test_id" value="' + testID + '" />',
+                "method": "post",
+                "action": '/admin/delete-test'
+            }).appendTo(document.body).submit();
+        }
+
+    </script>
+
+    <%} %>

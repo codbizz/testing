@@ -1,0 +1,319 @@
+<%- include('./../header')-%>
+
+    <%- include('./../navbar',{user: user})-%>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Create Question</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item active">Create Question</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <%- include('./../alert') %>
+                            <div class="card">
+                                <form method="post" action="/admin/add-manager-question" id="questionForm">
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label for="title_english">Question in English</label>
+                                            <input required type="text" name="question_in_english" class="form-control" placeholder="Enter Title in English" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="question_image">Question Image</label>
+                                            <div class="mb-2" style="height: 120px; width: 120px;">
+                                                <img id="question_image_src" src="" alt="question image" onerror="this.onerror=null;this.src='https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg';" style="height: 100%; width: 100%; object-fit: cover; border: 1px solid #ced4da; border-radius: 5px;" />
+                                            </div>
+                                            <div class="input-group">
+                                                <div class="custom-file">
+                                                    <input type="file" name="question_image" class="custom-file-input" id="question_image" accept="image/*" />
+                                                    <label class="custom-file-label" for="question_image">Choose File</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <% ["A","B","C","D"].forEach((element) => { %>
+                                            
+                                            <div class="form-group">
+                                                <label for="option_<%- element %>_image">Option <%- element %> Image</label>
+                                                <div class="mb-2" style="height: 120px; width: 120px;">
+                                                    <img id="option_<%- element %>_image_src" src="" alt="question image" style="height: 100%; width: 100%; object-fit: cover; border: 1px solid #ced4da; border-radius: 5px;" onerror="this.onerror=null;this.src='https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg';" />
+                                                </div>
+                                                <div class="input-group">
+                                                    <div class="custom-file">
+                                                        <input type="file" name="option_<%- element %>_image" class="custom-file-input" id="option_<%- element %>_image" accept="image/*" />
+                                                        <label class="custom-file-label" for="option_<%- element %>_image">Choose File</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="title_hindi">Option <%- element %> in English</label>
+                                                <input required type="text" id="OPTION_<%- element %>_ENGLISH" class="form-control" placeholder="Option <%- element %> in English" />
+                                            </div>
+
+                                        <% }); %>
+
+                                        <div class="form-group">
+                                            <label for="title_english">Correct Answer</label>
+                                            <input required id="subjectIdSelect" type="text" name="correct_option" class="form-control" placeholder="Enter Correct Answer" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="explanation_image">Explanation Image</label>
+                                            <div class="mb-2" style="height: 120px; width: 120px;">
+                                                <img id="explanation_image_src" src="" alt="Explanation Image" onerror="this.onerror=null;this.src='https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg';" style="height: 100%; width: 100%; object-fit: cover; border: 1px solid #ced4da; border-radius: 5px;" />
+                                            </div>
+                                            <div class="input-group">
+                                                <div class="custom-file">
+                                                    <input type="file" name="explanation_image" class="custom-file-input" id="explanation_image" accept="image/*" />
+                                                    <label class="custom-file-label" for="explanation_image">Choose File</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="title_english">Explanation in English</label>
+                                            <input required type="text" name="explanation_in_english" class="form-control" placeholder="Enter Explanation in English" />
+                                        </div>
+
+                                        <div id="errorContainer"></div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <button type="submit" id="submitBtn" class="btn btn-primary">Create Question</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="modal fade" id="myModal" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Question Added</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Question has been Added.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="window.location.replace(document.referrer)">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            $('#questionForm').submit(function (event) {
+                //check for Free Conversion 
+                $(this).find(':input').filter(function () {
+                    return !this.value;
+                }).attr('disabled', true);
+                // return true;
+                event.preventDefault();
+
+                var form = $(this);
+                var url = form.attr('action');
+                var method = form.attr('method');
+                var data = getFormData(form);
+
+                // disable submit button and show loading spinner
+                form.find('#submitBtn').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Loading...');
+                var abcde = ["A", "B", "C", "D", "E"];
+                var options = [];
+                abcde.forEach((identifire) => {
+                    if ($(`#OPTION_${identifire}_ENGLISH`).val() != null && $(`#OPTION_${identifire}_ENGLISH`).val() != "") {
+                        var fileInput = $(`#option_${identifire}_image`)[0];
+                        var file = fileInput.files[0];
+
+                        options.push({ 
+                            id: identifire, 
+                            text: { EN: $(`#OPTION_${identifire}_ENGLISH`).val() },
+                            image_url: file ?? null
+                        });
+                    }
+                })
+
+                data.options = options;
+
+                var fileInput = $(`#explanation_image`)[0];
+                var explanation_image_file = fileInput.files[0];
+                data.explanation_image = explanation_image_file ?? null;
+
+                var fileInput1 = $(`#question_image`)[0];
+                var question_image_file = fileInput1.files[0];
+                data.question_image = question_image_file ?? null;
+                
+                $(this).find(':input').attr('disabled', false);
+                // console.log(data);
+
+                // covert json data to form data for file upload
+                const formData = new FormData();
+                formData.append('correct_option', data?.correct_option);
+                formData.append('explanation_in_english', data?.explanation_in_english);
+                formData.append('question_id', data?.question_id);
+                formData.append('question_in_english', data?.question_in_english);
+                data?.options?.forEach((option, index) => {
+                    formData.append(`options[${index}][id]`, option.id);
+                    formData.append(`options[${index}][text][EN]`, option.text.EN);
+                    formData.append(`options[${index}][image_url]`, option.image_url);
+                });
+                formData.append('explanation_image', data?.explanation_image);
+                formData.append('question_image', data?.question_image);
+                
+                $.ajax({
+                    url: url,
+                    type: method,
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        $('#myModal').modal('show');
+                        // window.location.replace(`/admin/set-detail/${response.data._id}`);
+                        form.find('#submitBtn').prop('disabled', false).html('Create Question');
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        // handle error response here
+                        var alertPlaceholder = $('#errorContainer');
+                        var alert = $('<div></div>').addClass('alert alert-danger alert-dismissible fade show d-flex justify-content-between align-items-center mb-0').attr('role', 'alert').html(`${jqXHR.responseJSON.message} <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>`);
+                        alertPlaceholder.append(alert);
+                        setTimeout(() => {
+                            alert.removeClass('show').addClass('hide');
+                            setTimeout(() => {
+                                alert.remove();
+                            }, 150);
+                        }, 5000);
+                        form.find('#submitBtn').prop('disabled', false).html('Submit');
+                    }
+                });
+            });
+
+            function getFormData($form) {
+                var unindexed_array = $form.serializeArray();
+                var indexed_array = {};
+
+                $.map(unindexed_array, function (n, i) {
+                    indexed_array[n['name']] = n['value'];
+                });
+
+                return indexed_array;
+            }
+
+            $('#question_image').on('change', function (event) {
+                var input = event.target;
+                if (input.files && input.files[0]) {
+                    var file = input.files[0];
+                    if (file.type.startsWith('image/')) {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            $('#question_image_src').attr('src', e.target.result);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        alert('Please select a valid image file.');
+                        input.value = '';
+                    }
+                }
+            });
+
+            $('#option_A_image').on('change', function (event) {
+                var input = event.target;
+                if (input.files && input.files[0]) {
+                    var file = input.files[0];
+                    if (file.type.startsWith('image/')) {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            $('#option_A_image_src').attr('src', e.target.result);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        alert('Please select a valid image file.');
+                        input.value = '';
+                    }
+                }
+            });
+
+            $('#option_B_image').on('change', function (event) {
+                var input = event.target;
+                if (input.files && input.files[0]) {
+                    var file = input.files[0];
+                    if (file.type.startsWith('image/')) {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            $('#option_B_image_src').attr('src', e.target.result);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        alert('Please select a valid image file.');
+                        input.value = '';
+                    }
+                }
+            });
+
+            $('#option_C_image').on('change', function (event) {
+                var input = event.target;
+                if (input.files && input.files[0]) {
+                    var file = input.files[0];
+                    if (file.type.startsWith('image/')) {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            $('#option_C_image_src').attr('src', e.target.result);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        alert('Please select a valid image file.');
+                        input.value = '';
+                    }
+                }
+            });
+
+            $('#option_D_image').on('change', function (event) {
+                var input = event.target;
+                if (input.files && input.files[0]) {
+                    var file = input.files[0];
+                    if (file.type.startsWith('image/')) {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            $('#option_D_image_src').attr('src', e.target.result);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        alert('Please select a valid image file.');
+                        input.value = '';
+                    }
+                }
+            });
+
+            $('#explanation_image').on('change', function (event) {
+                var input = event.target;
+                if (input.files && input.files[0]) {
+                    var file = input.files[0];
+                    if (file.type.startsWith('image/')) {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            $('#explanation_image_src').attr('src', e.target.result);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        alert('Please select a valid image file.');
+                        input.value = '';
+                    }
+                }
+            });
+
+        </script>
+    <%- include('./../footer')-%>

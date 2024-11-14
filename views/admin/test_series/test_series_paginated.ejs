@@ -1,0 +1,53 @@
+<%- include('./../header')-%>
+
+    <%- include('./../navbar',{user: user})-%>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Test Series List</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+                                <li class="breadcrumb-item active">Test Series List</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div><!-- /.container-fluid -->
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+
+                <%- include('./../alert') %>
+                    <div>
+                        <form action="" id="filterForm">
+
+
+
+
+                            <input type="text" name="test_text" placeholder="Set Title in English"
+                                value="<%= myvalue.test_text ?? "" %>">
+
+                            <input type="number" name="limit" value="<%= myvalue.limit == null ? 10 :
+                                myvalue.limit=="" ? 10 : myvalue.limit %>" placeholder="Limit">
+                            <button type="submit">Search</button>
+                        </form>
+                    </div>
+
+                    <%- include('./test_series_table') %>
+
+
+
+
+
+            </section>
+        </div>
+
+
+
+
+
+        <%- include('./../footer')-%>

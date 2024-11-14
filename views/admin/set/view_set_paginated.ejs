@@ -1,0 +1,71 @@
+<%- include('./../header')-%>
+
+    <%- include('./../navbar',{user: user})-%>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Set List</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+                                <li class="breadcrumb-item active">Set List</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div><!-- /.container-fluid -->
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+
+                <%- include('./../alert') %>
+                    <div>
+                        <form action="" id="filterForm">
+                            <select name="subject_id" id="">
+                                <option value="">All Subjects</option>
+                                <% Object.keys(subjectStrings).forEach(key=> { %>
+                                    <option value="<%= key %>" <%=myvalue.subject_id==key ? "selected" : "" %>>
+                                        <%= subjectStrings[key] %>
+                                    </option>
+                                    <% }) %>
+
+                            </select>
+
+                            <select name="type" id="">
+                                <option value="">MOCK/SUBJECT</option>
+                                <option value="MOCK" <%=myvalue.type=="MOCK" ? "selected" : "" %>>MOCK</option>
+                                <option value="SUBJECT" <%=myvalue.type=="SUBJECT" ? "selected" : "" %>>SUBJECT</option>
+
+
+
+
+
+                            </select>
+
+
+                            <input type="text" name="set_text" placeholder="Set Title in English"
+                                value="<%= myvalue.set_text ?? "" %>">
+
+                            <input type="number" name="limit" value="<%= myvalue.limit == null ? 10 :
+                                myvalue.limit=="" ? 10 : myvalue.limit %>" placeholder="Limit">
+                            <button type="submit">Search</button>
+                        </form>
+                    </div>
+
+                    <%- include('./view_set_table') %>
+
+
+
+
+
+            </section>
+        </div>
+
+
+
+
+
+        <%- include('./../footer')-%>

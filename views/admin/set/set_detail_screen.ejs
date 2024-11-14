@@ -1,0 +1,100 @@
+<%- include('./../header')-%>
+
+    <%- include('./../navbar',{user: user})-%>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Set Details</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+                                <li class="breadcrumb-item active">Set Details</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div><!-- /.container-fluid -->
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+
+                <%- include('./../alert') %>
+
+                    <div class="row">
+                        <div class="col-md-6 offset-md-3">
+                            <table class="table table-hover text-nowrap">
+
+                                <tbody>
+                                    <tr>
+                                        <th style="width:70px">ID</th>
+                                        <td><%- setDetails._id ?? "" %></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="width:70px">Title in English</th>
+                                        <td><%- setDetails.title.EN ?? "" %></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="width:70px">Title in Hindi</th>
+                                        <td><%- setDetails.title.HI ?? "" %></td>
+                                    </tr>
+
+                                    <tr>
+                                        <th style="width:70px">Description in English</th>
+                                        <td><%- setDetails.description.EN ?? "" %></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="width:70px">Description in Hindi</th>
+                                        <td><%- setDetails.description.HI ?? "" %></td>
+                                    </tr>
+
+                                    <tr>
+                                        <th style="width:70px">Type</th>
+                                        <td><%- setDetails.type %></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="width:70px">Subject</th>
+                                        <td><%- setDetails.type=="SUBJECT" ?
+                                                setDetails.subject_id.name+`(${setDetails.subject_id.number_id})` : ""
+                                                %>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th style="width:70px">Paid/Free</th>
+                                        <td><%- setDetails.is_paid ? "PAID" : "FREE" %></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="width:70px">Amount</th>
+                                        <td><%- setDetails.amount ?? "" %></td>
+                                    </tr>
+
+                                    <tr>
+                                        <th style="width:70px">Day To Expire</th>
+                                        <td><%- setDetails.days_to_expire ?? "" %></td>
+                                    </tr>
+
+                                    <tr>
+                                        <th style="width:70px">Status</th>
+                                        <td><%- setDetails.active ? "ACTIVE" : "NOT ACTIVE" %></td>
+                                    </tr>
+
+                                    <tr>
+                                        <th style="width:70px">Number of Test Series</th>
+                                        <td><%- setDetails.test_series_ids ? setDetails.test_series_ids.length : "" %>
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+
+                        </div>
+
+
+                    </div>
+
+            </section>
+            <%- include('./view_test_series_table',{testLists:setDetails.test_series_ids}) %>
+        </div>
+        <%- include('./../footer')-%>

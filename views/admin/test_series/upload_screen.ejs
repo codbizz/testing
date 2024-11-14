@@ -1,0 +1,57 @@
+<%- include('./../header')-%>
+
+    <%- include('./../navbar',{user: user})-%>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Upload Test Series</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+                                <li class="breadcrumb-item active">Upload Test Series</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div><!-- /.container-fluid -->
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+
+                <%- include('./../alert') %>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-6 offset-md-3">
+                                <h2>Upload Test Series Excel File</h2>
+                                <form action="upload-test" method="POST" enctype="multipart/form-data" id="upload-form">
+                                    <div class="form-group">
+                                        <label for="fileUpload">Select Excel File:</label>
+                                        <input type="file" class="form-control-file" id="fileUpload" name="fileUpload"
+                                            accept=".xlsx, .xls" required>
+                                        <small id="fileHelp" class="form-text text-muted">Only Excel files with
+                                            extension .xlsx or .xls are allowed.</small>
+                                    </div>
+                                    <button onclick="checkFileAndSubmit()" class="btn btn-primary">Upload File</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+
+            </section>
+        </div>
+        <script>
+            function checkFileAndSubmit() {
+                const fileType = $('#fileUpload')[0].files[0].type;
+                if (fileType !== 'application/vnd.ms-excel' && fileType !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+                    alert('Please upload an Excel file with .xlsx or .xls extension.');
+                    return;
+                }
+                $('#upload-form').submit();
+            }
+
+        </script>
+        <%- include('./../footer')-%>

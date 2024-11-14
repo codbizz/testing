@@ -1,0 +1,174 @@
+<%- include('./../header')-%>
+
+    <%- include('./../navbar',{user: user})-%>
+        <style>
+            .loader_container {
+                position: fixed;
+                width: 100%;
+                left: 0;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 9999;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s ease;
+            }
+
+            .loader_container.show {
+                opacity: 1;
+                pointer-events: all;
+            }
+
+            .loader {
+                width: 50px;
+                padding: 8px;
+                aspect-ratio: 1;
+                border-radius: 50%;
+                background: #fff;
+                --_m:
+                    conic-gradient(#0000 10%, #000),
+                    linear-gradient(#000 0 0) content-box;
+                -webkit-mask: var(--_m);
+                mask: var(--_m);
+                -webkit-mask-composite: source-out;
+                mask-composite: subtract;
+                animation: l3 1s infinite linear;
+            }
+
+            @keyframes l3 {
+                to {
+                    transform: rotate(1turn);
+                }
+            }
+        </style>
+        <div class="loader_container hide">
+            <div class="loader"></div>
+        </div>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Upload Question File</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="/admin/dashboard">Home</a></li>
+                                <li class="breadcrumb-item active">Upload Question File</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div><!-- /.container-fluid -->
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+
+                <%- include('./../alert') %>
+                    <div id="alert-placeholder"></div>
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-6 offset-md-3">
+                                <h2>Upload Question CSV File</h2>
+                                <form id="upload-form">
+                                    <div class="form-group">
+                                        <label for="fileUpload">Select Excel File:</label>
+                                        <input type="file" class="form-control-file" id="fileUpload" name="fileUpload" accept=".csv" required />
+                                        <small id="fileHelp" class="form-text text-muted">Only CSV files with extension (.csv) are allowed.</small>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Upload File</button>
+                                    <a href="/sample_csv_file/correct-csv-formate-for-question.csv" download="correct-csv-formate-for-question.csv">
+                                        <button type="button" class="btn btn-primary">Download Sample CSV File</button>
+                                    </a>
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+            </section>
+
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+        <script>
+
+            $('#upload-form').on('submit', function (event) {
+                event.preventDefault();
+
+                const fileType = $('#fileUpload')[0].files[0].type;
+                const file = $('#fileUpload')[0].files[0];
+
+                const allowedFileTypes = ['text/csv'];
+
+                if (!allowedFileTypes.includes(fileType)) {
+                    showAlert('Please upload a CSV file with .csv extension.', 'warning');
+                    return;
+                }
+
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const csv = e.target.result;
+                        Papa.parse(csv, {
+                            header: true,
+                            complete: function (results) {
+                                const jsonData = results.data;
+                                document.querySelector('.loader_container').classList.add('show');
+
+                                fetch('/admin/upload-manager-test', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ csv_to_json: jsonData })
+                                })
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            throw new Error('Something went wrong!');
+                                        }
+                                        return response.json();
+                                    })
+                                    .then(data => {
+                                        console.log('Success:', data);
+                                        showAlert(data?.msg, 'success');
+                                    })
+                                    .catch(error => {
+                                        showAlert('Error: ' + error.message, 'danger');
+                                    }).finally(() => {
+                                        document.querySelector('.loader_container').classList.remove('show');
+                                    })
+
+                            },
+                            error: function (error) {
+                                showAlert('Error parsing CSV: ' + error.message, 'warning');
+                            }
+                        });
+                    };
+                    reader.readAsText(file);
+                }
+            });
+
+            function showAlert(message, type) {
+                var alertPlaceholder = document.getElementById('alert-placeholder');
+                var alert = document.createElement('div');
+                alert.className = `alert alert-${type} alert-dismissible fade show d-flex justify-content-between align-items-center`;
+                alert.role = 'alert';
+                alert.innerHTML = `
+                ${message}
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>`;
+                alertPlaceholder.appendChild(alert);
+                setTimeout(() => {
+                    alert.classList.remove('show');
+                    alert.classList.add('hide');
+                    setTimeout(() => {
+                        alertPlaceholder.removeChild(alert);
+                    }, 150);
+                }, 5000);
+            }
+
+        </script>
+        <%- include('./../footer')-%>

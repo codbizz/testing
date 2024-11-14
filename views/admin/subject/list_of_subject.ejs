@@ -1,0 +1,106 @@
+<div class="row">
+    <div class="col-6">
+        <% if(subjectList.length>0){ %>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Subjects</h3>
+
+                    <div class="card-tools">
+
+                    </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body table-responsive p-0">
+                    <table class="table table-hover text-nowrap">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <%for(var i=0;i<subjectList.length;i++){ %>
+                                <tr>
+                                    <td>
+                                        <%= subjectList[i].number_id %>
+                                    </td>
+                                    <td>
+                                        <%= subjectList[i].name %>
+                                    </td>
+                                    <td>
+                                        <form id="formId"
+                                            onsubmit="return confirm('Do you really want to delete the subject?');"
+                                            action="delete-subject" method="post"><input type="hidden" name="_id"
+                                                value="<%= subjectList[i]._id %>"> <button type="submit"
+                                                class="btn btn-block btn-danger">Delete</button></form>
+                                    </td>
+                                    <td>
+                                        <button type="submit" class="btn btn-block btn-primary"
+                                            onclick="updateSubject('<%= subjectList[i]._id %>','<%= subjectList[i].name %>')">Update
+                                            Name</button>
+                                    </td>
+                                </tr>
+                                <% }%>
+
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <% }else{%>
+
+                <h1>No Subjects Avaialble</h1>
+
+                <% } %>
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h3 class="card-title">Add New Subject</h3>
+                        </div>
+                        <!-- /.card-header -->
+                        <!-- form start -->
+                        <form class="form-horizontal" action="create-subject" method="post">
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <label for="name" class="col-sm-2 col-form-label">Name</label>
+                                    <div class="col-sm-10">
+                                        <input name="name" class="form-control" id="name" placeholder="Name">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                <button type="submit" class="btn btn-info">ADD</button>
+
+                            </div>
+                            <!-- /.card-footer -->
+                        </form>
+                    </div>
+                    <!-- /.card -->
+    </div>
+</div>
+<script>
+
+
+    function updateSubject(_id, oldName) {
+        let newName = prompt("New Subject name", oldName);
+        if (newName) {
+            const form = document.createElement('form');
+            form.method = "POST";
+            form.action = "update-subject";
+            const hiddenField = document.createElement('input');
+            hiddenField.type = 'hidden';
+            hiddenField.name = "_id";
+            hiddenField.value = _id;
+            const hiddenField2 = document.createElement('input');
+            hiddenField2.type = 'hidden';
+            hiddenField2.name = "name";
+            hiddenField2.value = newName;
+            form.appendChild(hiddenField);
+            form.appendChild(hiddenField2);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>

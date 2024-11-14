@@ -1,0 +1,217 @@
+<%- include('./../header')-%>
+
+    <%- include('./../navbar',{user: user})-%>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Create Question</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+                                <li class="breadcrumb-item active">Create Question</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div><!-- /.container-fluid -->
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+
+                <%- include('./../alert') %>
+
+
+                    <form method="post" action="/admin/create-question" id="questionForm">
+
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="title_english">Test ID</label>
+                                <input required type="text" name="test_id" class="form-control"
+                                    placeholder="Enter Test ID" value="<%- testId ?? "" %>">
+                            </div>
+                            <div class="form-group">
+                                <label for="title_english">Question in English</label>
+                                <input required type="text" name="question_in_english" class="form-control"
+                                    placeholder="Enter Title in English">
+                            </div>
+                            <div class="form-group">
+                                <label for="title_hindi">Question in Hindi</label>
+                                <input required type="text" name="question_in_hindi" class="form-control"
+                                    placeholder="Enter Title in Hindi">
+                            </div>
+
+                            <% ["A","B","C","D","E"].forEach((element)=>{ %>
+                                <div class="form-group">
+                                    <label for="title_hindi">Option <%- element %> in English</label>
+                                    <input <%- element=="A" ? "required" : "" %> type="text" id="OPTION_<%- element
+                                        %>_ENGLISH" class="form-control"
+                                        placeholder="Option <%- element %> in English">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="title_hindi">Option <%- element %> in Hindi</label>
+                                    <input <%- element=="A" ? "required" : "" %> type="text" id="OPTION_<%- element
+                                        %>_HINDI" class="form-control"
+                                        placeholder="Option <%- element %> in Hindi">
+                                </div>
+
+                                <% }); %>
+
+                                    <div class="form-group">
+                                        <label for="title_english">Correct Answer</label>
+                                        <select id="subjectIdSelect" name="correct_option" class="form-control">
+                                            <% ["A","B","C","D","E"].forEach((element)=>{ %>
+                                                <option value="<%- element %>"><%- element %></option>
+                                                <% }); %>
+                                        </select>
+                                    </div>
+
+
+
+                                    <div class="form-group">
+                                        <label for="title_english">Explanation in English</label>
+                                        <input required type="text" name="explanation_in_english" class="form-control"
+                                            placeholder="Enter Explanation in English">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="title_english">Explanation in Hindi</label>
+                                        <input required type="text" name="explanation_in_hindi" class="form-control"
+                                            placeholder="Enter Explanation in Hindi">
+                                    </div>
+
+
+                                    <% if(locals.subjectList!=null && locals.subjectList.length>0){ %>
+                                        <div class="form-group">
+                                            <label>Subject</label>
+                                            <select id="subjectIdSelect" name="subject_id" class="form-control">
+                                                <% subjectList.forEach(element=> {
+                                                    %>
+                                                    <option value="<%- element._id %>"><%- element.name %>(<%-
+                                                                element.number_id %>)
+                                                    </option>
+                                                    <% }); %>
+                                            </select>
+                                        </div>
+                                        <% } %>
+
+
+
+
+
+
+                                            <div id="errorContainer" class="alert alert-danger alert-dismissible"
+                                                style="display: none;"></div>
+
+                                            <div class=" card-footer">
+                                                <button type="submit" id="submitBtn" class="btn btn-primary">Create
+                                                    Question</button>
+                                            </div>
+                    </form>
+        </div>
+
+
+        </section>
+        </div>
+
+
+        <div class="modal fade" id="myModal" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Question Added</h4>
+
+                    </div>
+                    <div class="modal-body">
+                        <p>Question has been added to test series</p>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id="closeBtn">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <script>
+            $('#questionForm').submit(function (event) {
+                //check for Free Conversion 
+
+                $(this).find(':input').filter(function () {
+                    return !this.value;
+                }).attr('disabled', true);
+                // return true;
+                event.preventDefault();
+
+                var form = $(this);
+                var url = form.attr('action');
+                var method = form.attr('method');
+                var data = getFormData(form);
+
+                // disable submit button and show loading spinner
+                form.find('#submitBtn').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Loading...');
+                var abcde = ["A", "B", "C", "D", "E"];
+                var options = [];
+                for (let index = 0; index < abcde.length; index++) {
+                    const identifire = abcde[index];
+                    if ($(`#OPTION_${identifire}_ENGLISH`).val() != "" && $(`#OPTION_${identifire}_HINDI`).val() == "") {
+                        alert(`Option ${identifire} in Hindi is also required`);
+                        form.find('#submitBtn').prop('disabled', false).html('Submit');
+                        $(this).find(':input').attr('disabled', false);
+
+                        return;
+                    }
+                    if ($(`#OPTION_${identifire}_ENGLISH`).val() != null && $(`#OPTION_${identifire}_ENGLISH`).val() != "" && $(`#OPTION_${identifire}_HINDI`).val() != null && $(`#OPTION_${identifire}_HINDI`).val() != "") {
+                        options.push({ id: identifire, text: { EN: $(`#OPTION_${identifire}_ENGLISH`).val(), HI: $(`#OPTION_${identifire}_HINDI`).val() } })
+                    }
+
+                }
+
+
+                data.options = options;
+
+
+                var errorContainer = $('#errorContainer');
+                errorContainer.hide().empty();
+                $(this).find(':input').attr('disabled', false);
+                $.ajax({
+                    url: url,
+                    type: method,
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    success: function (response) {
+                        $('#myModal').modal({ backdrop: 'static', keyboard: false }, 'show');
+                        $("#closeBtn").attr("onclick", `window.location.replace('/admin/test-series-detail/${data.test_id}')`)
+
+                        // window.location.replace(`/admin/set-detail/${response.data._id}`);
+                        form.find('#submitBtn').prop('disabled', false).html('Submit');
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        // handle error response here
+                        if (jqXHR.responseJSON.data)
+                            errorContainer.html(jqXHR.responseJSON.data).show();
+                        else if (jqXHR.responseJSON.message)
+                            errorContainer.html(jqXHR.responseJSON.message).show();
+
+                        console.log(jqXHR.responseJSON.data);
+                        form.find('#submitBtn').prop('disabled', false).html('Submit');
+
+                    }
+                });
+            });
+
+            function getFormData($form) {
+                var unindexed_array = $form.serializeArray();
+                var indexed_array = {};
+
+                $.map(unindexed_array, function (n, i) {
+                    indexed_array[n['name']] = n['value'];
+                });
+
+                return indexed_array;
+            }
+        </script>
+        <%- include('./../footer')-%>
